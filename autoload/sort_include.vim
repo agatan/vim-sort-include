@@ -45,14 +45,20 @@ function! s:sorter(lhs, rhs) abort
   let l = substitute(a:lhs, pattern, '\1', 'g')
   let r = substitute(a:rhs, pattern, '\1', 'g')
 
-  return l > r ? 1 : -1
+  return l > r ? 1 : r > l ? -1 : 0
 endfunction
 
 function! s:sort(start, lines) abort
   if a:start > 0 && len(a:lines) > 1
     let sorted = sort(deepcopy(a:lines), 's:sorter')
-    if a:lines !=# sorted
-      call setline(a:start, sorted)
+    let uniqed = uniq(deepcopy(sorted), 's:sorter')
+    let count = len(sorted) - len(uniqed)
+    while count != 0
+      call add(uniqed, '')
+      let count -= 1
+    endwhile
+    if a:lines !=# uniqed
+      call setline(a:start, uniqed)
     endif
   endif
 endfunction
